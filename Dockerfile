@@ -4,32 +4,29 @@ FROM ${REPO_NAME}:${REPO_VERSION} AS builder
 RUN apk upgrade \
     && apk add --no-cache \
        boost-dev \
+       cmake \
+       curl \
+       g++ \
        openssl-dev \
+       patch \
        qt6-qtbase-dev \
        qt6-qttools-dev \
        qt6-qtbase-private-dev \
-       g++ \
-       cmake \
-       curl \
-       tar \
        samurai \
+       tar \
+       zlib-dev \
     && rm -rf /tmp/* /var/cache/apk/*
 ARG QBITTORRENT_VERSION
 RUN mkdir -p /tmp/qbittorrent \
     && cd /tmp/qbittorrent \
     && curl -sSL https://github.com/qbittorrent/qBittorrent/archive/refs/tags/release-${QBITTORRENT_VERSION}.tar.gz | tar xz --strip-components 1 \
     && cmake \
-       -DCMAKE_BUILD_TYPE=Release \
-       -DCMAKE_INTERPROCEDURAL_OPTIMIZATION=ON \
-       -DCMAKE_CXX_STANDARD=20 \
-       -DWEBUI=ON \
-       -DVERBOSE_CONFIGURE=OFF \
-       -DSTACKTRACE=OFF \
-       -DDBUS=OFF \
-       -DGUI=OFF \
-       -DQT6=ON \
-       -Brelease \
-       -GNinja \
+        -D CMAKE_BUILD_TYPE=Release \
+        -D GUI=OFF \
+        -D WEBUI=ON \
+        -D STACKTRACE=OFF \
+        -B release \
+        -G Ninja \
     && cmake --build release -j $(nproc) \
     && cmake --install release \
     && ls -al /usr/local/bin/ \
@@ -58,8 +55,6 @@ ENV QBT_PROFILE=/home/qbittorrent \
     PGID=100 \
     WEBUI_PORT=8080 \
     BT_PORT=34567 \
-    QB_USERNAME=admin \
-    QB_PASSWORD=adminadmin \
     LANG=zh_CN.UTF-8 \
     SHELL=/bin/bash \
     PS1="\u@\h:\w \$ "
@@ -70,7 +65,6 @@ RUN apk upgrade \
        curl \
        jq \
        openssl \
-       python3 \
        qt6-qtbase \
        qt6-qtbase-sqlite \
        shadow \
@@ -81,7 +75,7 @@ RUN apk upgrade \
     && ln -sf /usr/share/zoneinfo/${TZ} /etc/localtime \
     && echo "${TZ}" > /etc/timezone \
     && useradd qbittorrent -u ${PUID} -U -m -d ${QBT_PROFILE} -s /sbin/nologin \
-    && sed -i 's/dl-cdn.alpinelinux.org/mirrors.bfsu.edu.cn/g' /etc/apk/repositories
+    && sed -i 's/dl-cdn.alpinelinux.org/mirrors.ustc.edu.cn/g' /etc/apk/repositories
 COPY --from=builder /out /
 COPY root /
 WORKDIR /data
