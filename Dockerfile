@@ -48,7 +48,7 @@ RUN echo "Write dependency version" \
     && echo -e '{\n    "OpenSSL": "'$OpenSSL'",\n    "Boost": "'$Boost'",\n    "Libtorrent": "'$Libtorrent'",\n    "Qt": "'$Qt'",\n    "zlib": "'$zlib'"\n}' > /out/usr/bin/dependency-version.json \
     && rm -rf /tmp/* /var/cache/apk/*
 
-FROM alpine:3.23
+FROM alpine:3.24
 ENV QBT_PROFILE=/home/qbittorrent \
     TZ=Asia/Shanghai \
     PUID=1000 \
